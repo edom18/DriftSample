@@ -22,6 +22,10 @@ public class DriftSample : MonoBehaviour
     [SerializeField] private float _acc = 2f;
     [SerializeField] private float _rotateSpeed = 1f;
     [SerializeField] private float _turnRotateSpeed = 1.0f;
+    [SerializeField] private float _burstScale = 2f;
+    [SerializeField] private float _dragScale = 2f;
+    [SerializeField] private KeyCode _burstKey = KeyCode.W;
+    [SerializeField] private KeyCode _breakKey = KeyCode.Space;
     
     [SerializeField] private TMP_Text _velocityText;
     
@@ -42,10 +46,22 @@ public class DriftSample : MonoBehaviour
         
         Vector3 forward = transform.forward;
 
-        _velocoty += forward * (_acc * Time.deltaTime);
+        float acceleration = _acc;
+        if (Input.GetKey(_burstKey))
+        {
+            acceleration *= _burstScale;
+        }
+
+        float drag = Drag;
+        if (Input.GetKey(_breakKey))
+        {
+            drag *= _dragScale;
+        }
+        
+        _velocoty += forward * (acceleration * Time.deltaTime);
         _velocoty = Vector3.RotateTowards(_velocoty, forward * _velocoty.magnitude, _rotateSpeed * Time.deltaTime, 0);
         
-        _velocoty -= _velocoty * (Drag * Time.deltaTime);
+        _velocoty -= _velocoty * (drag * Time.deltaTime);
         transform.position += _velocoty * Time.deltaTime;
         
         _velocityText.text = $"{_velocoty.magnitude:F2} km/s";
